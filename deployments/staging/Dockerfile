@@ -1,6 +1,6 @@
 # Pull base image
 
-FROM python:3.8.5
+FROM python:3.9.7
 
 RUN apt-get update && \
     apt-get -y install netcat git && \
