@@ -1,0 +1,58 @@
+name: Django project
+
+on:
+  push:
+    branches-ignore:
+      - main
+      - develop
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:13.5
+        env:
+          POSTGRES_USER: mtservis-backend
+          POSTGRES_PASSWORD: mtservis-backend
+          POSTGRES_DB: mtservis-backend
+        ports: ['5432:5432']
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+        architecture: 'x64'
+    - name: If cache exist load cached files
+      uses: actions/cache@v1
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements/test.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+    - name: Install dependencies
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements/test.txt
+    - name: Check imports with "isort"
+      run: isort . --check-only --diff
+    - name: Check code format with "black"
+      run: black . --check --diff
+    - name: Check code style with "flake8"
+      run: |
+        flake8 . --count --show-source --statistics
+        flake8 . --count --exit-zero --statistics
+    - name: Load environment variables
+      uses: c-py/action-dotenv-to-setenv@v2
+      with:
+        env-file: deployments/test/.env
+    - name: Run migrations
+      run: python src/manage.py migrate
+    - name: Run tests
+      run: python -m pytest
