@@ -1,0 +1,14 @@
+README.md
+.github/
+.pytest_cache/
+tests/
+.flake8
+.gitignore
+.pre-commit-config.yaml
+CHANGELOG
+pyproject.toml
+pytest.ini
+README.md
+.env/
+src/static
+src/media

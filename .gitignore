@@ -1,0 +1,11 @@
+.env/
+.git/
+*.sw[a-z]
+*.py[a-z]
+.idea/
+__pycache__/
+
+src/static
+src/media
+deployments/development/.env
+deployments/development/.env_server

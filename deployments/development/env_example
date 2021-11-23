@@ -1,0 +1,11 @@
+export PROJECT_NAME="mtservis-backend"
+export DJANGO_SETTINGS_MODULE="config.settings.development"
+export DB_NAME="mtservis-backend"
+export DB_HOST="localhost"
+export DB_PORT="5432"
+export DB_USER="mtservis-backend"
+export DB_PASS="mtservis-backend"
+export SECRET_KEY="s6*0(9hh10e^cnzn5g92n_xo9v&+wo%$ja*nj44r=dv74@g#p6"
+export PYTHONDONTWRITEBYTECODE=1
+export REDIS_LOCATION="redis://127.0.0.1:6379/1"
+export REDIS_PASSWORD=""
