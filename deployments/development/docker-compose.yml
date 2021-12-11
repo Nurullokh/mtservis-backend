@@ -1,6 +1,6 @@
 version: "3"
 services:
-  postgres-service:
+  postgres-service-mtservis:
     image: postgres:13.5
     restart: always
     container_name: "${PROJECT_NAME}-postgres"
@@ -15,11 +15,11 @@ services:
 
 
 
-  redis-service:
-    image: redis:6.0.9-alpine
+  redis-service-mtservis:
+    image: redis:6.0.10-alpine
     container_name: "${PROJECT_NAME}-redis"
-    expose:
-      - 6379
+    ports:
+      - 6380:6379
 
 volumes:
   mtservis-backend-db:
