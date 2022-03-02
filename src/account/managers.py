@@ -1,6 +1,7 @@
 from django.contrib.auth.base_user import BaseUserManager
+from django.core.exceptions import PermissionDenied
 
-from .constants import UserType
+from .constants import UserStatus, UserType
 from .utils import send_email
 
 
@@ -47,3 +48,8 @@ class UserManager(BaseUserManager):
         self.model.set_cache(str(user.email), code)
         send_email.delay(user.email, code, "Your verification code is ")
         return user
+
+    def validate_user_status(self, email):
+        user = self.filter(email=email)
+        if user.exists() and user.first().user_status == UserStatus.BLOCKED:
+            raise PermissionDenied("You have been blocked!")
