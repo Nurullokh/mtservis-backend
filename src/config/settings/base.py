@@ -1,4 +1,5 @@
 import os
+from datetime import timedelta
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -25,6 +26,7 @@ THIRD_PARTY_APPS = [
     "corsheaders",
     "django_extensions",
     "django_celery_beat",
+    "softdelete",
 ]
 LOCAL_APPS = [
     "common",
@@ -36,8 +38,11 @@ INSTALLED_APPS = BASE_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "common.middleware.AuthenticationMiddlewareJWT",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
@@ -47,7 +52,7 @@ ROOT_URLCONF = "config.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [os.path.join(BASE_DIR, "templates")],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -73,6 +78,7 @@ DATABASES = {
         "PASSWORD": os.environ["DB_PASS"],
     }
 }
+print(os.environ.get("REDIS_LOCATION"))
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
@@ -83,6 +89,7 @@ CACHES = {
         },
     }
 }
+
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
@@ -139,3 +146,36 @@ AUTH_USER_MODEL = "account.User"
 AUTHENTICATION_BACKENDS = ("django.contrib.auth.backends.ModelBackend",)
 
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
+
+CORS_ALLOW_HEADERS = [
+    "accept",
+    "accept-encoding",
+    "authorization",
+    "content-type",
+    "content-language",
+    "dnt",
+    "origin",
+    "user-agent",
+    "x-csrftoken",
+    "x-requested-with",
+]
+
+SIMPLE_JWT = {
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
+    "ROTATE_REFRESH_TOKENS": False,
+    "BLACKLIST_AFTER_ROTATION": False,
+}
+
+PASSWORD_LENGTH = 13
+
+SENDGRID_API_KEY = os.environ.get("SENDGRID_API_KEY")
+print(SENDGRID_API_KEY)
+EMAIL_BACKEND = "sendgrid_backend.SendgridBackend"
+SENDGRID_SANDBOX_MODE_IN_DEBUG = False
+EMAIL_HOST = "smtp.sendgrid.net"
+EMAIL_HOST_USER = "apikey"
+EMAIL_HOST_PASSWORD = SENDGRID_API_KEY
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+SENDER_EMAIL = "notifications@mt-servis.tech"

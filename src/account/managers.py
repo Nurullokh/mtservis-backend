@@ -1,14 +1,16 @@
 from django.contrib.auth.base_user import BaseUserManager
 from django.core.exceptions import PermissionDenied
 
+from softdelete.models import SoftDeleteManager
+
 from .constants import UserStatus, UserType
-from .utils import send_email
+from .utils import send_email, validate_password, validate_phone, validate_zip
 
 
-class UserManager(BaseUserManager):
+class UserManager(SoftDeleteManager, BaseUserManager):
     def _create_user(self, email, password, **extra_fields):
         if not email:
-            raise ValueError("The email field has to be given")
+            raise ValueError("The email field has to be given.")
         user = self.model(email=email, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
@@ -21,6 +23,7 @@ class UserManager(BaseUserManager):
         if self.all_with_deleted().filter(email=email).exists():
             self.all_with_deleted().get(email=email).delete()
         password = extra_fields.pop("password")
+        validate_password(password)
         return self._create_user(email, password, **extra_fields)
 
     def create_superuser(self, email, password, **extra_fields):
@@ -41,12 +44,19 @@ class UserManager(BaseUserManager):
     def register_user(self, data):
         self.delete_inactive_user(data["email"])
         data.setdefault("is_active", False)
-        categories = data.pop("categories")
+        validate_phone(data["phone_number"])
+        validate_zip(data["zip_code"])
         user = self.create_user(**data)
-        user.categories.set(categories)
         code = self.model.generate_code()
+        print("*" * 100)
         self.model.set_cache(str(user.email), code)
-        send_email.delay(user.email, code, "Your verification code is ")
+        print("*" * 100)
+        send_email(
+            user.email,
+            code,
+            "Your verification code is ",
+            data["first_name"] + " " + data["last_name"],
+        )
         return user
 
     def validate_user_status(self, email):

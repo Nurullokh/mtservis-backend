@@ -1,16 +1,21 @@
+import random
 import uuid
 
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
+from django.core.cache import cache
 from django.core.mail import send_mail
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
+from rest_framework_simplejwt.tokens import RefreshToken
+from softdelete.models import SoftDeleteObject
+
 from account.constants import Regions, UserStatus, UserType
 from account.managers import UserManager
 
 
-class User(AbstractBaseUser, PermissionsMixin):
+class User(SoftDeleteObject, AbstractBaseUser, PermissionsMixin):
     guid = models.UUIDField(unique=True, default=uuid.uuid4, editable=False)
     email = models.EmailField(_("email address"), unique=True)
     first_name = models.CharField(max_length=50)
@@ -19,7 +24,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     region = models.CharField(choices=Regions.choices, max_length=20)
     city = models.CharField(max_length=30, blank=True, null=True)
     street = models.CharField(max_length=120)
-    zip_code = models.CharField(max_length=10, blank=True, null=True)
+    zip_code = models.CharField(max_length=6, blank=True, null=True)
     user_type = models.CharField(choices=UserType.choices, max_length=15)
     user_status = models.CharField(
         choices=UserStatus.choices,
@@ -75,3 +80,15 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return f"{self.first_name} {self.last_name} {self.email}"
+
+    def tokens(self):
+        refresh = RefreshToken.for_user(self)
+        return {"refresh": str(refresh), "access": str(refresh.access_token)}
+
+    @classmethod
+    def generate_code(cls):
+        return random.randint(100000, 999999)
+
+    @classmethod
+    def set_cache(cls, key, val, ttl=300):
+        cache.set(f"{key}", val, timeout=ttl)
