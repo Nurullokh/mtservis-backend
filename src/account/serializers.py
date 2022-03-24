@@ -115,3 +115,7 @@ class ChangePasswordSerializer(serializers.Serializer):
         if password != confirm_password:
             raise serializers.ValidationError("passwords did not match")
         return attrs
+
+
+class LogOutSerializer(serializers.Serializer):
+    refresh_token = serializers.CharField()

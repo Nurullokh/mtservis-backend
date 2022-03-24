@@ -4,6 +4,7 @@ from account.views import (
     ChangePasswordView,
     ConfirmRegistrationView,
     ForgotPasswordView,
+    LogOutView,
     RegisterView,
     ResetPasswordView,
     UserLoginView,
@@ -36,4 +37,5 @@ urlpatterns = [
         ChangePasswordView.as_view(),
         name="change-password",
     ),
+    path("logout/", LogOutView.as_view(), name="logout"),
 ]

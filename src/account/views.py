@@ -12,13 +12,16 @@ from rest_framework.generics import (
 )
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.token_blacklist.models import OutstandingToken
+from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
 
 from account.serializers import (
     ChangePasswordSerializer,
     ConfirmResgistrationSerializer,
     ForgotPasswordSerializer,
+    LogOutSerializer,
     RegisterSerializer,
     ResetPasswordSerializer,
     UserLoginSerializer,
@@ -126,3 +129,25 @@ class ChangePasswordView(GenericAPIView):
         instance.set_password(serializer.validated_data["password"])
         instance.save()
         return Response(status=status.HTTP_201_CREATED)
+
+
+class LogOutView(APIView):
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def post(self, request):
+        serializer = LogOutSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        try:
+            refresh_token = request.data["refresh_token"]
+            token = RefreshToken(refresh_token)
+            token.blacklist()
+            user = request.user
+            user.save()
+            return Response(
+                {"detail": "Successfully logged out!"},
+                status=status.HTTP_205_RESET_CONTENT,
+            )
+        except TokenError:
+            return Response(
+                {"detail": "Token Error"}, status=status.HTTP_400_BAD_REQUEST
+            )
