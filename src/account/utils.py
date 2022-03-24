@@ -10,7 +10,7 @@ from config.celery import app
 
 
 @app.task
-def send_email(email, code, message, full_name="MTServis User"):
+def send_email(email, code, message, full_name=""):
     subject = "Verification code"
     message = render_to_string(
         "account/email.html",
