@@ -12,7 +12,7 @@ exclude = '''
     | \.pytest_cache
     | \.tox
     | \venv
-    | \env
+    | env
     | \.venv
     | \.env
     | \.vscode

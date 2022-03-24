@@ -10,13 +10,12 @@ from config.celery import app
 
 
 @app.task
-def send_email(email, code, message, full_name):
+def send_email(email, code, message, full_name="MTServis User"):
     subject = "Verification code"
     message = render_to_string(
         "account/email.html",
         {"code": code, "message": message, "full_name": full_name},
     )
-    print(settings.SENDGRID_API_KEY)
     message = Mail(
         from_email=settings.SENDER_EMAIL,
         to_emails=[email],
@@ -26,7 +25,6 @@ def send_email(email, code, message, full_name):
 
     sg = SendGridAPIClient(settings.SENDGRID_API_KEY)
     sg.send(message)
-    print("-" * 100)
 
 
 def validate_password(password):

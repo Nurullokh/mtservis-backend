@@ -48,14 +48,12 @@ class UserManager(SoftDeleteManager, BaseUserManager):
         validate_zip(data["zip_code"])
         user = self.create_user(**data)
         code = self.model.generate_code()
-        print("*" * 100)
         self.model.set_cache(str(user.email), code)
-        print("*" * 100)
-        send_email(
+        send_email.delay(
             user.email,
             code,
             "Your verification code is ",
-            data["first_name"] + " " + data["last_name"],
+            user.first_name,
         )
         return user
 

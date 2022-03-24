@@ -47,3 +47,13 @@ class RegisterSerializer(serializers.ModelSerializer):
             raise ValidationError("User with this email already exists.")
 
         return attrs
+
+
+class ConfirmResgistrationSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    code = serializers.IntegerField()
+
+    def validate_code(self, code):
+        if code not in range(100000, 1000000):
+            raise ValidationError("Invalid code!")
+        return code

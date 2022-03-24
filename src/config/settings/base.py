@@ -78,7 +78,6 @@ DATABASES = {
         "PASSWORD": os.environ["DB_PASS"],
     }
 }
-print(os.environ.get("REDIS_LOCATION"))
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
@@ -169,8 +168,18 @@ SIMPLE_JWT = {
 
 PASSWORD_LENGTH = 13
 
+CELERY_BROKER_URL = os.environ.get("REDIS_LOCATION")
+CELERY_RESULT_BACKEND = os.environ.get("REDIS_LOCATION")
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_TIMEZONE = "Asia/Tashkent"
+CELERY_TASK_ALWAYS_EAGER = not CELERY_BROKER_URL
+
+CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
+
+
 SENDGRID_API_KEY = os.environ.get("SENDGRID_API_KEY")
-print(SENDGRID_API_KEY)
 EMAIL_BACKEND = "sendgrid_backend.SendgridBackend"
 SENDGRID_SANDBOX_MODE_IN_DEBUG = False
 EMAIL_HOST = "smtp.sendgrid.net"
