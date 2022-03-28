@@ -35,7 +35,7 @@ jobs:
             docker exec $(docker ps -q -f name=${{ secrets.DOCKER_SERVICE_NAME }}) python manage.py migrate
           host: ${{ secrets.HOST }}
           args: -tt
-          user: fitness_user
+          user: ubuntu
           key: ${{ secrets.PRIVKEY }}
       - name: Set up Python 3.9 Migrate
         uses: actions/setup-python@v2
