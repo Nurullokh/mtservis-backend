@@ -1,4 +1,4 @@
-name: Deploy to production
+name: CD Dev
 
 on: [ workflow_dispatch ]
 
@@ -10,35 +10,34 @@ jobs:
         id: ecr-login
         uses: thalesvon/ecr-login@master
         env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID_PROD }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_DEFAULT_OUTPUT: json
-          AWS_REGION: ${{ secrets.AWS_REGION_PROD }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY_PROD }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         with:
           args: 'get-login --no-include-email --region ${AWS_REGION}'
       - name: 'Docker Login'
         run: ${{ steps. ecr-login.outputs.login-string }}
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Build  Images (Production)
+      - name: Build  Images (Staging)
         run: |
-          docker build -t ${{ secrets.IMAGE_NAME }} -f deployments/production/Dockerfile .
-          docker tag ${{ secrets.IMAGE_NAME }}:latest ${{ secrets.DOCKER_REGISTRY_PROD }}/${{ secrets.IMAGE_NAME }}:latest
-          docker push ${{ secrets.DOCKER_REGISTRY_PROD }}/${{ secrets.IMAGE_NAME }}:latest
+          docker build -t ${{ secrets.IMAGE_NAME }} -f deployments/staging/Dockerfile .
+          docker tag ${{ secrets.IMAGE_NAME }}:latest ${{ secrets.DOCKER_REGISTRY }}/${{ secrets.IMAGE_NAME }}:latest
+          docker push ${{ secrets.DOCKER_REGISTRY }}/${{ secrets.IMAGE_NAME }}:latest
       - name: Deploy and Migrate
         uses: fifsky/ssh-action@master
         with:
           command: |
-            aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${{ secrets.DOCKER_REGISTRY_PROD }}
-            docker pull ${{ secrets.DOCKER_REGISTRY_PROD }}/${{ secrets.IMAGE_NAME }}:latest
-            docker service update --with-registry-auth --image ${{ secrets.DOCKER_REGISTRY_PROD }}/${{ secrets.IMAGE_NAME }}:latest ${{ secrets.DOCKER_SERVICE_NAME }}
+            aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.DOCKER_REGISTRY }}
+            docker pull ${{ secrets.DOCKER_REGISTRY }}/${{ secrets.IMAGE_NAME }}:latest
+            docker service update --with-registry-auth --image ${{ secrets.DOCKER_REGISTRY }}/${{ secrets.IMAGE_NAME }}:latest ${{ secrets.DOCKER_SERVICE_NAME }}
             docker exec $(docker ps -q -f name=${{ secrets.DOCKER_SERVICE_NAME }}) python manage.py migrate
-          host: ${{ secrets.PROD_HOST }}
+          host: ${{ secrets.HOST }}
           args: -tt
-          user: ubuntu
-          key: ${{ secrets.PROD_PRIVKEY }}
-      - name: Set up Python 3.8 Migrate
+          user: fitness_user
+          key: ${{ secrets.PRIVKEY }}
+      - name: Set up Python 3.9 Migrate
         uses: actions/setup-python@v2
         with:
-          python-version: 3.8
-          architecture: 'x64'
+          python-version: 3.9
