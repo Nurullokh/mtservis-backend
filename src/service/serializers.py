@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from service.models import Service, ServiceType
+from service.models import Brand, Service, ServiceType
 
 
 class ServiceSerializer(serializers.ModelSerializer):
@@ -49,7 +49,7 @@ class ServiceTypeSerializer(serializers.ModelSerializer):
         super(ServiceTypeSerializer, self).__init__(*args, **kwargs)
         action = kwargs["context"]["view"].action
         if action == "retrieve":
-            self.fields["icon"] = serializers.SerializerMethodField()
+            self.fields["service"] = serializers.SerializerMethodField()
 
     def get_service(self, obj):
         if obj.service:
@@ -60,4 +60,31 @@ class ServiceTypeSerializer(serializers.ModelSerializer):
 class ServiceTypeListSerializer(serializers.ModelSerializer):
     class Meta:
         model = ServiceType
+        fields = ("id",)
+
+
+class BrandSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Brand
+        fields = (
+            "id",
+            "name",
+            "service_type",
+        )
+
+    def __init__(self, *args, **kwargs):
+        super(BrandSerializer, self).__init__(*args, **kwargs)
+        action = kwargs["context"]["view"].action
+        if action == "retrieve":
+            self.fields["service_type"] = serializers.SerializerMethodField()
+
+    def get_service_type(self, obj):
+        if obj.service_type:
+            return obj.service_type.name_en
+        return None
+
+
+class BrandListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Brand
         fields = ("id",)

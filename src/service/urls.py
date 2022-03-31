@@ -10,6 +10,7 @@ router.register(r"service", views.ServiceViewSet, basename="service")
 router.register(
     r"service-type", views.ServiceTypeViewSet, basename="service-type"
 )
+router.register(r"brand", views.BrandViewSet, basename="brand")
 
 
 urlpatterns = [
