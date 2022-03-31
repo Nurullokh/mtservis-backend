@@ -6,6 +6,7 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 from account.models import User
 from account.utils import validate_password
+from document.serializers import ImageModelSerializer
 
 
 class UserLoginSerializer(TokenObtainPairSerializer):
@@ -39,6 +40,7 @@ class RegisterSerializer(serializers.ModelSerializer):
             "city",
             "street",
             "zip_code",
+            "profile_image",
         )
 
     def validate(self, attrs):
@@ -48,6 +50,10 @@ class RegisterSerializer(serializers.ModelSerializer):
             raise ValidationError("User with this email already exists.")
 
         return attrs
+
+    def to_representation(self, instance):
+        self.fields["profile_image"] = ImageModelSerializer()
+        return super(RegisterSerializer, self).to_representation(instance)
 
 
 class ConfirmResgistrationSerializer(serializers.Serializer):
@@ -119,3 +125,39 @@ class ChangePasswordSerializer(serializers.Serializer):
 
 class LogOutSerializer(serializers.Serializer):
     refresh_token = serializers.CharField()
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = get_user_model()
+        fields = (
+            "id",
+            "first_name",
+            "last_name",
+            "phone_number",
+            "region",
+            "city",
+            "street",
+            "zip_code",
+            "user_type",
+            "email",
+        )
+
+        extra_kwargs = {
+            "first_name": {
+                "required": False,
+                "allow_null": False,
+            },
+            "last_name": {
+                "required": False,
+                "allow_null": False,
+            },
+            "email": {"read_only": True},
+            "user_type": {"read_only": True},
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(UserSerializer, self).__init__(*args, **kwargs)
+        action = kwargs["context"]["view"].action
+        if action in ["list", "detail", "get_profile"]:
+            self.fields["profile_image"] = ImageModelSerializer()
