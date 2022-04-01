@@ -1,3 +1,5 @@
+from django.utils.translation import get_language
+
 from rest_framework import serializers
 
 from service.models import Brand, Service, ServiceType
@@ -12,7 +14,6 @@ class ServiceSerializer(serializers.ModelSerializer):
             "name_ru",
             "name_en",
             "icon",
-            "created_at",
         )
 
     def __init__(self, *args, **kwargs):
@@ -28,9 +29,14 @@ class ServiceSerializer(serializers.ModelSerializer):
 
 
 class ServiceListSerializer(serializers.ModelSerializer):
+    name = serializers.SerializerMethodField()
+
     class Meta:
         model = Service
-        fields = ("id",)
+        fields = ("id", "name")
+
+    def get_name(self, instance):
+        return getattr(instance, f"name_{get_language()}")
 
 
 class ServiceTypeSerializer(serializers.ModelSerializer):
@@ -42,7 +48,6 @@ class ServiceTypeSerializer(serializers.ModelSerializer):
             "name_ru",
             "name_en",
             "service",
-            "created_at",
         )
 
     def __init__(self, *args, **kwargs):
@@ -58,9 +63,14 @@ class ServiceTypeSerializer(serializers.ModelSerializer):
 
 
 class ServiceTypeListSerializer(serializers.ModelSerializer):
+    name = serializers.SerializerMethodField()
+
     class Meta:
         model = ServiceType
-        fields = ("id",)
+        fields = ("id", "name")
+
+    def get_name(self, instance):
+        return getattr(instance, f"name_{get_language()}")
 
 
 class BrandSerializer(serializers.ModelSerializer):
@@ -85,6 +95,8 @@ class BrandSerializer(serializers.ModelSerializer):
 
 
 class BrandListSerializer(serializers.ModelSerializer):
+    service_type = ServiceTypeListSerializer()
+
     class Meta:
         model = Brand
-        fields = ("id",)
+        fields = ("id", "name", "service_type")
