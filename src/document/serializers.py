@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from document.models import ImageModel
+from document.models import DocumentModel, ImageModel
 
 
 class ImageModelSerializer(serializers.ModelSerializer):
@@ -26,6 +26,15 @@ class ImageModelMiniSerializer(serializers.ModelSerializer):
 class VideoModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = ImageModel
+        fields = (
+            "id",
+            "file",
+        )
+
+
+class DocumentModelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DocumentModel
         fields = (
             "id",
             "file",

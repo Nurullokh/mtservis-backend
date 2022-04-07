@@ -7,4 +7,5 @@ urlpatterns = [
     path("v1/", include("document.urls")),
     path("v1/", include("service.urls")),
     path("v1/", include("order.urls")),
+    path("v1/", include("technician.urls")),
 ]

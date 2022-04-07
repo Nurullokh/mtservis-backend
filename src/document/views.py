@@ -2,11 +2,16 @@ import os
 
 from rest_framework import mixins
 from rest_framework.exceptions import ValidationError
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
-from document.models import ImageModel, VideoModel
-from document.serializers import ImageModelSerializer, VideoModelSerializer
+from document.models import DocumentModel, ImageModel, VideoModel
+from document.serializers import (
+    DocumentModelSerializer,
+    ImageModelSerializer,
+    VideoModelSerializer,
+)
 from document.tasks import create_thumbnail_images
 
 
@@ -62,3 +67,11 @@ class UploadVideoViewSet(
         error_list.append("images can not be null")
         if error_list:
             raise ValidationError(error_list)
+
+
+class UploadDocumentViewSet(
+    mixins.ListModelMixin, mixins.CreateModelMixin, GenericViewSet
+):
+    serializer_class = DocumentModelSerializer
+    queryset = DocumentModel.objects.all()
+    permission_classes = (IsAuthenticated,)
