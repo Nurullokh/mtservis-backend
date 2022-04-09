@@ -35,6 +35,7 @@ LOCAL_APPS = [
     "document",
     "order",
     "technician",
+    "blog",
 ]
 
 INSTALLED_APPS = BASE_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -197,3 +198,5 @@ EMAIL_HOST_PASSWORD = SENDGRID_API_KEY
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 SENDER_EMAIL = "notifications@mt-servis.tech"
+
+BLOG_SHORT_LINK = os.environ.get("BLOG_SHORT_LINK")
