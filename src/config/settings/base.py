@@ -200,3 +200,4 @@ EMAIL_USE_TLS = True
 SENDER_EMAIL = "notifications@mt-servis.tech"
 
 BLOG_SHORT_LINK = os.environ.get("BLOG_SHORT_LINK")
+CORS_ALLOW_ALL_ORIGINS = True
