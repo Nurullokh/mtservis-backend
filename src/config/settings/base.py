@@ -31,6 +31,11 @@ THIRD_PARTY_APPS = [
 LOCAL_APPS = [
     "common",
     "account",
+    "service",
+    "document",
+    "order",
+    "technician",
+    "blog",
 ]
 
 INSTALLED_APPS = BASE_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -45,6 +50,7 @@ MIDDLEWARE = [
     "common.middleware.AuthenticationMiddlewareJWT",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "django.middleware.locale.LocaleMiddleware",
 ]
 
 ROOT_URLCONF = "config.urls"
@@ -124,8 +130,12 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-LANGUAGE_CODE = "en-us"
-
+LANGUAGE_CODE = "en"
+LANGUAGES = [
+    ("uz", "Uzbek"),
+    ("en", "English"),
+    ("ru", "Russian"),
+]
 TIME_ZONE = "UTC"
 
 USE_I18N = True
@@ -188,3 +198,12 @@ EMAIL_HOST_PASSWORD = SENDGRID_API_KEY
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 SENDER_EMAIL = "notifications@mt-servis.tech"
+
+BLOG_SHORT_LINK = os.environ.get("BLOG_SHORT_LINK")
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOWED_ORIGIN = ["http://localhost:3000", "http://localhost:3011"]
+CORS_ORIGIN_REGEX_WHITELIST = [
+    "http://localhost:3000",
+    "http://localhost:3011",
+]

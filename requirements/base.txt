@@ -14,3 +14,4 @@ Pillow==9.0.1
 djangorestframework==3.12.4
 django-celery-beat==2.2.1
 django-sendgrid-v5
+click==8.0.4

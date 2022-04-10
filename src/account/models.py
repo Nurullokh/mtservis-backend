@@ -4,7 +4,7 @@ import uuid
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.core.cache import cache
 from django.core.mail import send_mail
-from django.db import models
+from django.db import models, transaction
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
@@ -13,6 +13,7 @@ from softdelete.models import SoftDeleteObject
 
 from account.constants import Regions, UserStatus, UserType
 from account.managers import UserManager
+from document.models import ImageModel
 
 
 class User(SoftDeleteObject, AbstractBaseUser, PermissionsMixin):
@@ -26,6 +27,9 @@ class User(SoftDeleteObject, AbstractBaseUser, PermissionsMixin):
     street = models.CharField(max_length=120)
     zip_code = models.CharField(max_length=6, blank=True, null=True)
     user_type = models.CharField(choices=UserType.choices, max_length=15)
+    profile_image = models.ForeignKey(
+        ImageModel, on_delete=models.SET_NULL, null=True, blank=True
+    )
     user_status = models.CharField(
         choices=UserStatus.choices,
         default=UserStatus.ACTIVE,
@@ -92,3 +96,9 @@ class User(SoftDeleteObject, AbstractBaseUser, PermissionsMixin):
     @classmethod
     def set_cache(cls, key, val, ttl=300):
         cache.set(f"{key}", val, timeout=ttl)
+
+    def update_user(self, data):
+        with transaction.atomic():
+            for key, val in data.items():
+                setattr(self, key, val)
+            self.save()

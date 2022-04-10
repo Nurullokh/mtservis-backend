@@ -4,6 +4,7 @@ from django.contrib.auth import get_user_model
 from django.core.cache import cache
 
 from rest_framework import permissions, status
+from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import (
     CreateAPIView,
@@ -12,6 +13,7 @@ from rest_framework.generics import (
 )
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.viewsets import GenericViewSet
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.token_blacklist.models import OutstandingToken
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -25,6 +27,7 @@ from account.serializers import (
     RegisterSerializer,
     ResetPasswordSerializer,
     UserLoginSerializer,
+    UserSerializer,
     VerifyEmailSerializer,
 )
 from account.utils import send_email
@@ -151,3 +154,36 @@ class LogOutView(APIView):
             return Response(
                 {"detail": "Token Error"}, status=status.HTTP_400_BAD_REQUEST
             )
+
+
+class UserViewSet(GenericViewSet):
+    serializer_class = UserSerializer
+    queryset = get_user_model().objects.all()
+    permission_classes = (permissions.IsAuthenticated,)
+
+    @action(methods=["PUT", "PATCH"], detail=False, url_path="update-profile")
+    def update_profile(self, request):
+        user = self.request.user
+        serializer = self.serializer_class(
+            instance=user,
+            data=request.data,
+            context=self.get_serializer_context(),
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
+    @action(methods=["GET"], detail=False, url_path="get-profile")
+    def get_profile(self, request):
+        serializer = self.serializer_class(
+            request.user, context=self.get_serializer_context()
+        )
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(methods=["DELETE"], detail=False, url_path="delete-profile")
+    def delete_profile(self, request):
+        request.user.delete()
+        return Response(
+            {"detail": "Your profile is successfully deleted!"},
+            status=status.HTTP_204_NO_CONTENT,
+        )
