@@ -27,7 +27,7 @@ class UploadImageViewSet(
             objs = list()
             for file in request.FILES.getlist("images"):
                 ct = os.path.splitext(file.name.lower())[1]
-                if ct not in (".jpg", ".jpeg", ".png"):
+                if ct not in (".jpg", ".jpeg", ".png", ".svg"):
                     raise ValidationError(
                         "available format (.jpg, .jpeg, .png)"
                     )

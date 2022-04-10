@@ -20,6 +20,9 @@ class ServiceType(BaseModel):
     name_uz = models.CharField(max_length=255)
     name_ru = models.CharField(max_length=255)
     name_en = models.CharField(max_length=255)
+    logo = models.ForeignKey(
+        ImageModel, on_delete=models.SET_NULL, null=True, blank=True
+    )
     service = models.ForeignKey(
         Service, on_delete=models.CASCADE, related_name="service_types"
     )
