@@ -41,7 +41,7 @@ class ServiceListSerializer(serializers.ModelSerializer):
 
     def get_icon(self, instance):
         if instance.icon:
-            return instance.icon.thumbnail_150.url
+            return instance.icon.file.url
         return None
 
     def get_name(self, instance):
@@ -86,7 +86,7 @@ class ServiceTypeListSerializer(serializers.ModelSerializer):
 
     def get_logo(self, instance):
         if instance.logo:
-            return instance.logo.thumbnail_150.url
+            return instance.logo.file.url
         return None
 
     def get_name(self, instance):
