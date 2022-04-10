@@ -22,7 +22,7 @@ class ServiceSerializer(serializers.ModelSerializer):
         if action == "retrieve":
             self.fields["icon"] = serializers.SerializerMethodField()
 
-    def get_image(self, obj):
+    def get_icon(self, obj):
         if obj.image:
             return obj.image.thumbnail_150.url
         return None
@@ -33,7 +33,16 @@ class ServiceListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Service
-        fields = ("id", "name")
+        fields = ("id", "name", "icon")
+
+    def to_representation(self, instance):
+        self.fields["icon"] = serializers.SerializerMethodField()
+        return super(ServiceListSerializer, self).to_representation(instance)
+
+    def get_icon(self, instance):
+        if instance.icon:
+            return instance.icon.thumbnail_150.url
+        return None
 
     def get_name(self, instance):
         return getattr(instance, f"name_{get_language()}")
@@ -67,7 +76,18 @@ class ServiceTypeListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ServiceType
-        fields = ("id", "name")
+        fields = ("id", "name", "logo")
+
+    def to_representation(self, instance):
+        self.fields["logo"] = serializers.SerializerMethodField()
+        return super(ServiceTypeListSerializer, self).to_representation(
+            instance
+        )
+
+    def get_logo(self, instance):
+        if instance.logo:
+            return instance.logo.thumbnail_150.url
+        return None
 
     def get_name(self, instance):
         return getattr(instance, f"name_{get_language()}")
