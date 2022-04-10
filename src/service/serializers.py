@@ -2,6 +2,7 @@ from django.utils.translation import get_language
 
 from rest_framework import serializers
 
+from document.serializers import ImageModelSerializer
 from service.models import Brand, Service, ServiceType
 
 
@@ -36,13 +37,8 @@ class ServiceListSerializer(serializers.ModelSerializer):
         fields = ("id", "name", "icon")
 
     def to_representation(self, instance):
-        self.fields["icon"] = serializers.SerializerMethodField()
+        self.fields["icon"] = ImageModelSerializer()
         return super(ServiceListSerializer, self).to_representation(instance)
-
-    def get_icon(self, instance):
-        if instance.icon:
-            return instance.icon.file.url
-        return None
 
     def get_name(self, instance):
         return getattr(instance, f"name_{get_language()}")
@@ -79,15 +75,10 @@ class ServiceTypeListSerializer(serializers.ModelSerializer):
         fields = ("id", "name", "logo")
 
     def to_representation(self, instance):
-        self.fields["logo"] = serializers.SerializerMethodField()
+        self.fields["logo"] = ImageModelSerializer()
         return super(ServiceTypeListSerializer, self).to_representation(
             instance
         )
-
-    def get_logo(self, instance):
-        if instance.logo:
-            return instance.logo.file.url
-        return None
 
     def get_name(self, instance):
         return getattr(instance, f"name_{get_language()}")
