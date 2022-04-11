@@ -5,7 +5,7 @@ from service.models import Brand, Service, ServiceType
 
 class ServiceAdmin(admin.ModelAdmin):
     model = Service
-    list_display = ("id", "name_uz", "name_en", "name_ru", "icon")
+    list_display = ("order_number", "name_uz", "name_en", "name_ru", "icon")
     search_fields = (
         "name_en",
         "name_uz",
@@ -15,7 +15,7 @@ class ServiceAdmin(admin.ModelAdmin):
 
 class ServiceTypeAdmin(admin.ModelAdmin):
     model = ServiceType
-    list_display = ("id", "name_uz", "name_en", "name_ru", "service")
+    list_display = ("order_number", "name_uz", "name_en", "name_ru", "service")
     search_fields = (
         "name_en",
         "name_uz",
