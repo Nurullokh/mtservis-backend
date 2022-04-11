@@ -11,6 +11,7 @@ class Service(BaseModel):
     icon = models.ForeignKey(
         ImageModel, on_delete=models.SET_NULL, null=True, blank=True
     )
+    order_number = models.PositiveIntegerField()
 
     def __str__(self):
         return self.name_en
@@ -26,6 +27,7 @@ class ServiceType(BaseModel):
     service = models.ForeignKey(
         Service, on_delete=models.CASCADE, related_name="service_types"
     )
+    order_number = models.PositiveIntegerField()
 
     def __str__(self):
         return self.name_en

@@ -21,6 +21,7 @@ class ServiceTypeAdmin(admin.ModelAdmin):
         "name_uz",
         "name_ru",
     )
+    list_filter = ("service",)
 
 
 class BrandAdmin(admin.ModelAdmin):

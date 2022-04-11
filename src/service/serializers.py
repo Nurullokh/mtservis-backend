@@ -21,12 +21,7 @@ class ServiceSerializer(serializers.ModelSerializer):
         super(ServiceSerializer, self).__init__(*args, **kwargs)
         action = kwargs["context"]["view"].action
         if action == "retrieve":
-            self.fields["icon"] = serializers.SerializerMethodField()
-
-    def get_icon(self, obj):
-        if obj.image:
-            return obj.image.thumbnail_150.url
-        return None
+            self.fields["icon"] = ImageModelSerializer()
 
 
 class ServiceListSerializer(serializers.ModelSerializer):

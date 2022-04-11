@@ -1,6 +1,8 @@
+import django_filters
 from rest_framework import mixins, permissions
 from rest_framework.viewsets import GenericViewSet
 
+from service.filter import ServiceTypeFilter
 from service.models import Brand, Service, ServiceType
 from service.serializers import (
     BrandListSerializer,
@@ -21,7 +23,7 @@ class ServiceViewSet(
     GenericViewSet,
 ):
     serializer_class = ServiceSerializer
-    queryset = Service.objects.all()
+    queryset = Service.objects.all().order_by("order_number")
 
     def get_permissions(self):
         if self.action in ("create", "update", "partial_update", "destroy"):
@@ -44,9 +46,10 @@ class ServiceTypeViewSet(
     mixins.DestroyModelMixin,
     GenericViewSet,
 ):
-
     serializer_class = ServiceTypeSerializer
-    queryset = ServiceType.objects.all()
+    queryset = ServiceType.objects.all().order_by("order_number")
+    filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
+    filter_class = ServiceTypeFilter
 
     def get_permissions(self):
         if self.action in ("create", "update", "partial_update", "destroy"):
