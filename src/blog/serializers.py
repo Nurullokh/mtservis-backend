@@ -34,17 +34,12 @@ class BlogSerializer(serializers.ModelSerializer):
         super(BlogSerializer, self).__init__(*args, **kwargs)
         action = kwargs["context"]["view"].action
         if action == "retrieve":
-            self.fields["image"] = serializers.SerializerMethodField()
+            self.fields["image"] = ImageModelSerializer()
             self.fields["blog_images"] = BlogImagesMiniSerializer(many=True)
             self.fields["share_url"] = serializers.SerializerMethodField()
 
     def get_share_url(self, obj):
         return settings.BLOG_SHORT_LINK + obj.title.replace(" ", "-")
-
-    def get_image(self, obj):
-        if obj.image:
-            return obj.image.thumbnail_150.url
-        return None
 
 
 class BlogImagesSerializer(serializers.ModelSerializer):
@@ -64,8 +59,6 @@ class BlogImagesSerializer(serializers.ModelSerializer):
 
 
 class BlogListSerializer(serializers.ModelSerializer):
-    image = serializers.SerializerMethodField()
-
     class Meta:
         model = Blog
         fields = (
@@ -75,7 +68,6 @@ class BlogListSerializer(serializers.ModelSerializer):
             "created_at",
         )
 
-    def get_image(self, obj):
-        if obj.image:
-            return obj.image.thumbnail_150.url
-        return None
+    def __init__(self, *args, **kwargs):
+        super(BlogListSerializer, self).__init__(*args, **kwargs)
+        self.fields["image"] = ImageModelSerializer()
