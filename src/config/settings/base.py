@@ -202,8 +202,13 @@ SENDER_EMAIL = "notifications@mt-servis.tech"
 BLOG_SHORT_LINK = os.environ.get("BLOG_SHORT_LINK")
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOWED_ORIGIN = ["http://localhost:3000", "http://localhost:3011"]
+CORS_ALLOWED_ORIGIN = [
+    "http://localhost:3000",
+    "http://localhost:3011",
+    "https://homeservice1.vercel.app/",
+]
 CORS_ORIGIN_REGEX_WHITELIST = [
     "http://localhost:3000",
     "http://localhost:3011",
+    "https://homeservice1.vercel.app/",
 ]
